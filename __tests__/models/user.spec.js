@@ -1,5 +1,6 @@
-const dbReset = require('../../db_reset');
 const faker = require('faker');
+
+const dbReset = require('../../db_reset');
 const User = require('../../models/user');
 
 beforeEach(() => dbReset());

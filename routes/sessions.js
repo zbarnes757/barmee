@@ -7,20 +7,14 @@ const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'kitty-kats';
 
-router.get('/_current', passport.authenticate('jwt', { session: false }), (req, res) => {
-  console.dir(req.user);
-  if (req.user) {
-    return res.json({ user: req.user });
-  }
-
-  return res.boom.unauthorized();
-});
+router.get('/_current', passport.authenticate('jwt', { session: false }), ({ user }, res) => res.json({ user }));
 
 router.post('/signup', async (req, res) => {
   try {
     const user = await new User({ email: req.body.email, password: req.body.password }).save();
     const token = jwt.sign({ id: user.get('id') }, JWT_SECRET, { expiresIn: "1 day" });
 
+    res.status(201);
     res.json({ token });
   } catch (error) {
     res.boom.badRequest();
