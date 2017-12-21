@@ -37,12 +37,10 @@ passport.use(new JwtStrategy(jwtOpts,
 ));
 
 passport.serializeUser((user, done) => {
-  console.log('serialize user', user);
   done(null, user.get('id'))
 });
 
 passport.deserializeUser(async (id, done) => {
-  console.log('deserialize', id);
   const user = await new User({ id }).fetch();
   done(null, user);
 });

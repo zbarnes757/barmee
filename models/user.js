@@ -26,11 +26,7 @@ class User extends Bookshelf.Model {
   }
 
   async comparePassword(inputPassword) {
-    const res = await bcrypt.compare(inputPassword, this.attributes.password);
-    console.log('inputPassword', inputPassword);
-    console.log('hash', this.attributes);
-    console.log('result', res);
-    return res;
+    return await bcrypt.compare(inputPassword, this.attributes.password);
   }
 }
 
