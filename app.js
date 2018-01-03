@@ -15,7 +15,6 @@ const sessions = require('./routes/sessions');
 const User = require('./models/user');
 
 const app = express();
-const JWT_SECRET = process.env.JWT_SECRET || 'kitty-kats';
 
 // Setup passport jwt
 const jwtOpts = {
