@@ -2,10 +2,9 @@ const bodyParser = require('body-parser');
 const boom = require('express-boom');
 const express = require('express');
 const helmet = require('helmet');
-const JwtStrategy = require('passport-jwt').Strategy
-const ExtractJwt = require('passport-jwt').ExtractJwt
+const JwtStrategy = require('passport-jwt').Strategy;
+const { ExtractJwt } = require('passport-jwt');
 const logger = require('morgan');
-const path = require('path');
 const passport = require('passport');
 
 global.Promise = require('bluebird');
@@ -19,10 +18,11 @@ const app = express();
 // Setup passport jwt
 const jwtOpts = {
   secretOrKey: process.env.JWT_SECRET || 'kitty-kats',
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 
-passport.use(new JwtStrategy(jwtOpts,
+passport.use(new JwtStrategy(
+  jwtOpts,
   async (jwtPayload, done) => {
     try {
       const user = await new User({ id: jwtPayload.id }).fetch();
@@ -32,11 +32,11 @@ passport.use(new JwtStrategy(jwtOpts,
     } catch (error) {
       return done(null, false);
     }
-  }
+  },
 ));
 
 passport.serializeUser((user, done) => {
-  done(null, user.get('id'))
+  done(null, user.get('id'));
 });
 
 passport.deserializeUser(async (id, done) => {
@@ -55,10 +55,10 @@ app.use(passport.session());
 app.use('/sessions', sessions);
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => res.boom.notFound());
+app.use((req, res) => res.boom.notFound());
 
 // error handler
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

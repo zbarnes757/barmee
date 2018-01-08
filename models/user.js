@@ -3,30 +3,30 @@ const Bookshelf = require('../bookshelf');
 const uuidv4 = require('uuid/v4');
 
 class User extends Bookshelf.Model {
-  get tableName() { return 'users'; }
+  get tableName() { return 'users'; } // eslint-disable-line class-methods-use-this
 
-  get hasTimestamps() { return true; }
+  get hasTimestamps() { return true; } // eslint-disable-line class-methods-use-this
 
-  get hidden() { return [ 'password' ]; }
+  get hidden() { return ['password']; } // eslint-disable-line class-methods-use-this
 
   initialize() {
     this.on('creating', this.hashPassword, this);
     this.on('creating', this.setId, this);
   }
 
-  async hashPassword(model, attrs, opts) {
+  async hashPassword(model) { // eslint-disable-line class-methods-use-this
     const hash = await bcrypt.hash(model.attributes.password, 10);
     model.set('password', hash);
     return model;
   }
 
-  setId(model, attrs, opts) {
+  setId(model) { // eslint-disable-line class-methods-use-this
     model.set('id', uuidv4());
     return model;
   }
 
-  async comparePassword(inputPassword) {
-    return await bcrypt.compare(inputPassword, this.attributes.password);
+  comparePassword(inputPassword) {
+    return bcrypt.compare(inputPassword, this.attributes.password);
   }
 }
 

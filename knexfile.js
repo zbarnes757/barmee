@@ -5,8 +5,8 @@ module.exports = {
       host: '127.0.0.1',
       user: 'postgres',
       password: 'postgres',
-      database: 'barmee_dev'
-    }
+      database: 'barmee_dev',
+    },
   },
 
   test: {
@@ -15,8 +15,8 @@ module.exports = {
       host: '127.0.0.1',
       user: 'postgres',
       password: 'postgres',
-      database: 'barmee_test'
-    }
+      database: 'barmee_test',
+    },
   },
 
   production: {
@@ -24,10 +24,10 @@ module.exports = {
     connection: process.env.DATABASE_URL,
     pool: {
       min: 2,
-      max: 10
+      max: 10,
     },
     migrations: {
-      tableName: 'knex_migrations'
-    }
-  }
+      tableName: 'knex_migrations',
+    },
+  },
 };

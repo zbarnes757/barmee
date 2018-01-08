@@ -12,7 +12,7 @@ router.get('/_current', passport.authenticate('jwt', { session: false }), ({ use
 router.post('/signup', async (req, res) => {
   try {
     const user = await new User({ email: req.body.email, password: req.body.password }).save();
-    const token = jwt.sign({ id: user.get('id') }, JWT_SECRET, { expiresIn: "1 day" });
+    const token = jwt.sign({ id: user.get('id') }, JWT_SECRET, { expiresIn: '1 day' });
 
     res.status(201);
     res.json({ token });
@@ -23,14 +23,14 @@ router.post('/signup', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const user = await new User({ email: req.body.email}).fetch();
+    const user = await new User({ email: req.body.email }).fetch();
 
     if (!user) {
       res.boom.notFound(`No user found with email: ${req.body.email}`);
     } else {
       const passwordsMatch = await user.comparePassword(req.body.password);
       if (passwordsMatch) {
-        const token = jwt.sign({ id: user.get('id') }, JWT_SECRET, { expiresIn: "1 day" });
+        const token = jwt.sign({ id: user.get('id') }, JWT_SECRET, { expiresIn: '1 day' });
 
         res.json({ token });
       } else {

@@ -13,12 +13,12 @@ beforeEach(() => dbReset());
 describe('GET /sessions/_current', () => {
   test('should return the current user based on jwt', async () => {
     const user = await new User({
-        email: faker.internet.email(),
-        password: faker.random.word()
-      })
+      email: faker.internet.email(),
+      password: faker.random.word(),
+    })
       .save();
 
-    const token = jwt.sign({ id: user.get('id') }, JWT_SECRET, { expiresIn: "1 day" });
+    const token = jwt.sign({ id: user.get('id') }, JWT_SECRET, { expiresIn: '1 day' });
 
     const { body, statusCode } = await request(app)
       .get('/sessions/_current')
@@ -32,7 +32,7 @@ describe('GET /sessions/_current', () => {
   });
 
   test('should return 401 if no valid user associated with jwt', () => {
-    const token = jwt.sign({ id: faker.random.uuid() }, JWT_SECRET, { expiresIn: "1 day" });
+    const token = jwt.sign({ id: faker.random.uuid() }, JWT_SECRET, { expiresIn: '1 day' });
 
     return request(app)
       .get('/sessions/_current')
@@ -48,33 +48,31 @@ describe('POST /sessions/signup', () => {
       .post('/sessions/signup')
       .send({
         email,
-        password: faker.random.word()
+        password: faker.random.word(),
       })
       .set('Content-Type', 'application/json')
       .expect(201);
 
-      expect(response.body.token).toBeDefined();
+    expect(response.body.token).toBeDefined();
 
-      const user = await new User({ email }).fetch();
-      expect(user).toBeDefined();
+    const user = await new User({ email }).fetch();
+    expect(user).toBeDefined();
   });
 
-  test('should 400 if missing values', () => {
-    return request(app)
-      .post('/sessions/signup')
-      .send({ password: faker.random.word() })
-      .set('Content-Type', 'application/json')
-      .expect(400);
-  });
+  test('should 400 if missing values', () => request(app)
+    .post('/sessions/signup')
+    .send({ password: faker.random.word() })
+    .set('Content-Type', 'application/json')
+    .expect(400));
 });
 
 describe('POST /sessions/login', () => {
   test('should return a token after sign in', async () => {
     const password = faker.random.word();
     const user = await new User({
-        email: faker.internet.email(),
-        password
-      })
+      email: faker.internet.email(),
+      password,
+    })
       .save();
 
     const response = await request(app)
@@ -85,28 +83,26 @@ describe('POST /sessions/login', () => {
     expect(response.body.token).toBeDefined();
   });
 
-  test('should 404 if user email does not exist', () => {
-    return request(app)
-      .post('/sessions/login')
-      .send({
-        email: faker.internet.email(),
-        password: faker.random.word()
-      })
-      .expect(404);
-  });
+  test('should 404 if user email does not exist', () => request(app)
+    .post('/sessions/login')
+    .send({
+      email: faker.internet.email(),
+      password: faker.random.word(),
+    })
+    .expect(404));
 
   test('should 401 if password is incorrect', async () => {
     const user = await new User({
       email: faker.internet.email(),
-      password: faker.random.word()
+      password: faker.random.word(),
     })
-    .save();
+      .save();
 
-    const response = await request(app)
+    await request(app)
       .post('/sessions/login')
       .send({
         email: user.get('email'),
-        password: faker.random.word()
+        password: faker.random.word(),
       })
       .expect(401);
   });
