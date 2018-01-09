@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 const boom = require('express-boom');
 const express = require('express');
+const graphqlHTTP = require('express-graphql');
 const helmet = require('helmet');
 const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
@@ -10,7 +11,7 @@ const passport = require('passport');
 global.Promise = require('bluebird');
 
 const sessions = require('./routes/sessions');
-
+const schema = require('./graphql/schema');
 const User = require('./models/user');
 
 const app = express();
@@ -52,7 +53,14 @@ app.use(helmet());
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Routes
+const root = { hello: () => 'Hello World' };
 app.use('/sessions', sessions);
+app.use('/graphql', graphqlHTTP({
+  schema,
+  rootValue: root,
+  graphiql: true,
+}));
 
 // catch 404 and forward to error handler
 app.use((req, res) => res.boom.notFound());
