@@ -1,13 +1,10 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const passport = require('passport');
 const User = require('../models/user');
 
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'kitty-kats';
-
-router.get('/_current', passport.authenticate('jwt', { session: false }), ({ user }, res) => res.json({ user }));
 
 router.post('/signup', async (req, res) => {
   try {

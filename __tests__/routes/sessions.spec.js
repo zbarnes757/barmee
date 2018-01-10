@@ -1,45 +1,11 @@
 const faker = require('faker');
-const jwt = require('jsonwebtoken');
 const request = require('supertest');
 
 const app = require('../../app');
 const dbReset = require('../../db_reset');
 const User = require('../../models/user');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'kitty-kats';
-
 beforeEach(() => dbReset());
-
-describe('GET /sessions/_current', () => {
-  test('should return the current user based on jwt', async () => {
-    const user = await new User({
-      email: faker.internet.email(),
-      password: faker.random.word(),
-    })
-      .save();
-
-    const token = jwt.sign({ id: user.get('id') }, JWT_SECRET, { expiresIn: '1 day' });
-
-    const { body, statusCode } = await request(app)
-      .get('/sessions/_current')
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(statusCode).toBe(200);
-    expect(body.user.id).toBe(user.get('id'));
-    expect(body.user.email).toBe(user.get('email'));
-    expect(body.user.created_at).toBeDefined();
-    expect(body.user.updated_at).toBeDefined();
-  });
-
-  test('should return 401 if no valid user associated with jwt', () => {
-    const token = jwt.sign({ id: faker.random.uuid() }, JWT_SECRET, { expiresIn: '1 day' });
-
-    return request(app)
-      .get('/sessions/_current')
-      .set('Authorization', `Bearer ${token}`)
-      .expect(401);
-  });
-});
 
 describe('POST /sessions/signup', () => {
   test('should create a new user', async () => {
