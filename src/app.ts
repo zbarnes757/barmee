@@ -1,18 +1,18 @@
-const bodyParser = require('body-parser');
-const boom = require('express-boom');
-const express = require('express');
+import * as bodyParser from 'body-parser';
+import * as express from 'express';
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
-const helmet = require('helmet');
-const JwtStrategy = require('passport-jwt').Strategy;
-const { ExtractJwt } = require('passport-jwt');
-const logger = require('morgan');
-const passport = require('passport');
+import * as helmet from 'helmet';
+import { Strategy, ExtractJwt } from 'passport-jwt';
+import * as logger from 'morgan';
+import * as passport from 'passport';
+import * as bluebird from 'bluebird';
+import * as createError from 'http-errors';
 
-global.Promise = require('bluebird');
+global.Promise = bluebird;
 
 const sessions = require('./routes/sessions');
 const schema = require('./schema');
-const User = require('./models/user');
+import User from './models/user';
 
 const app = express();
 
@@ -22,11 +22,13 @@ const jwtOpts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 
-passport.use(new JwtStrategy(
+passport.use(new Strategy(
   jwtOpts,
   async (jwtPayload, done) => {
     try {
-      const user = await new User({ id: jwtPayload.id }).fetch();
+      const user = await new User()
+        .forge({ id: jwtPayload.id })
+        .fetch();
       if (!user) { return done(null, false); }
 
       return done(null, user);
@@ -36,19 +38,20 @@ passport.use(new JwtStrategy(
   },
 ));
 
-passport.serializeUser((user, done) => {
+passport.serializeUser((user: User, done) => {
   done(null, user.get('id'));
 });
 
 passport.deserializeUser(async (id, done) => {
-  const user = await new User({ id }).fetch();
+  const user = await new User()
+    .forge({ id })
+    .fetch();
   done(null, user);
 });
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(boom());
 app.use(helmet());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -68,10 +71,10 @@ if (process.env.NODE_ENV === 'dev') {
 }
 
 // catch 404 and forward to error handler
-app.use((req, res) => res.boom.notFound());
+app.use((req, res) => createError(404, 'Page not found.'));
 
 // error handler
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -79,6 +82,7 @@ app.use((err, req, res) => {
   // render the error page
   res.status(err.status || 500);
   res.json('error');
+  next();
 });
 
 module.exports = app;

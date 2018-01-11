@@ -1,9 +1,9 @@
-const faker = require('faker');
+import * as faker from 'faker';
 const request = require('supertest');
 
 const app = require('../../app');
 const dbReset = require('../../db_reset');
-const User = require('../../models/user');
+import User from '../../models/user';
 
 beforeEach(() => dbReset());
 
@@ -21,7 +21,7 @@ describe('POST /sessions/signup', () => {
 
     expect(response.body.token).toBeDefined();
 
-    const user = await new User({ email }).fetch();
+    const user = await new User().forge({ email }).fetch();
     expect(user).toBeDefined();
   });
 
@@ -35,10 +35,11 @@ describe('POST /sessions/signup', () => {
 describe('POST /sessions/login', () => {
   test('should return a token after sign in', async () => {
     const password = faker.random.word();
-    const user = await new User({
-      email: faker.internet.email(),
-      password,
-    })
+    const user = await new User()
+      .forge({
+        email: faker.internet.email(),
+        password,
+      })
       .save();
 
     const response = await request(app)
@@ -58,10 +59,11 @@ describe('POST /sessions/login', () => {
     .expect(404));
 
   test('should 401 if password is incorrect', async () => {
-    const user = await new User({
-      email: faker.internet.email(),
-      password: faker.random.word(),
-    })
+    const user = await new User()
+      .forge({
+        email: faker.internet.email(),
+        password: faker.random.word(),
+      })
       .save();
 
     await request(app)
