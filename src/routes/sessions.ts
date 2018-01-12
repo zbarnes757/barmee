@@ -23,27 +23,30 @@ router.post('/signup', async (req: Request, res: Response, next: NextFunction) =
   }
 });
 
-router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/login', async (req: Request, res: Response) => {
   try {
     const user = await new User()
       .forge({ email: req.body.email })
       .fetch();
 
     if (!user) {
-      return next(createError(404, `No user found with email: ${req.body.email}`));
+      console.log("no user found with email");
+      return createError(404, `No user found with email: ${req.body.email}`);
     } else {
       const passwordsMatch = await user.comparePassword(req.body.password);
       if (passwordsMatch) {
         const token = jwt.sign({ id: user.get('id') }, JWT_SECRET, { expiresIn: '1 day' });
-
+        console.log("got a match");
         res.json({ token });
-        return next()
+        return res;
       } else {
-        return next(createError(401, 'Invalid email/password combination.'));
+        console.log(req.body.email, req.body.password);
+        return createError(401, 'Invalid email/password combination.');
       }
     }
   } catch (error) {
-    return next(createError(401, 'Unable to log this user in.'));
+    console.log(error);
+    return createError(401, 'Unable to log this user in.');
   }
 });
 
