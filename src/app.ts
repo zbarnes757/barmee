@@ -12,6 +12,7 @@ global.Promise = bluebird;
 const sessions = require('./routes/sessions');
 const schema = require('./schema');
 import User from './models/user';
+import { NextFunction } from 'express';
 
 const app = express();
 
@@ -25,7 +26,7 @@ passport.use(new Strategy(
   jwtOpts,
   async (jwtPayload, done) => {
     try {
-      const user = await new User()
+      const user = await User
         .forge({ id: jwtPayload.id })
         .fetch();
       if (!user) { return done(null, false); }
@@ -41,8 +42,8 @@ passport.serializeUser((user: User, done) => {
   done(null, user.get('id'));
 });
 
-passport.deserializeUser(async (id, done) => {
-  const user = await new User()
+passport.deserializeUser(async (id: String, done) => {
+  const user = await User
     .forge({ id })
     .fetch();
   done(null, user);
