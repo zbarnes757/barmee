@@ -5,8 +5,12 @@
 /**
  * Module dependencies.
  */
-
-const app = require('../app');
+let app;
+if (process.env.NODE_ENV === 'dev') {
+  app = require('../build/app'); // eslint-disable-line
+} else {
+  app = require('./app'); // eslint-disable-line
+}
 const debug = require('debug')('barmee:server');
 const http = require('http');
 
