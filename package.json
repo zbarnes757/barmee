@@ -6,8 +6,7 @@
     "start": "node ./bin/www",
     "test": "jest --forceExit",
     "lint": "eslint . --fix",
-    "build": "gulp",
-    "postinstall": "npm run build"
+    "build": "gulp"
   },
   "engines": {
     "node": ">= 8.5.0"
