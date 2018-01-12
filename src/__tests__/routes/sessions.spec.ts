@@ -21,7 +21,7 @@ describe('POST /sessions/signup', () => {
 
     expect(response.body.token).toBeDefined();
 
-    const user = await new User().forge({ email }).fetch();
+    const user = await User.forge({ email }).fetch();
     expect(user).toBeDefined();
   });
 
@@ -35,7 +35,7 @@ describe('POST /sessions/signup', () => {
 describe('POST /sessions/login', () => {
   test('should return a token after sign in', async () => {
     const password = faker.random.word();
-    const user = await new User()
+    const user = await User
       .forge({
         email: faker.internet.email(),
         password,
@@ -50,7 +50,7 @@ describe('POST /sessions/login', () => {
     expect(response.body.token).toBeDefined();
   });
 
-  test('should 404 if user email does not exist', () => request(app)
+  test('should 404 if user email does not exist', async () => await request(app)
     .post('/sessions/login')
     .send({
       email: faker.internet.email(),
@@ -59,7 +59,7 @@ describe('POST /sessions/login', () => {
     .expect(404));
 
   test('should 401 if password is incorrect', async () => {
-    const user = await new User()
+    const user = await User
       .forge({
         email: faker.internet.email(),
         password: faker.random.word(),

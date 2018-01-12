@@ -8,7 +8,7 @@ beforeEach(() => dbReset());
 describe('user.save', () => {
   test('should save a user with a hashed password', () => {
     const password = faker.random.word();
-    return new User()
+    return User
       .forge({
         email: faker.internet.email(),
         password,
@@ -21,7 +21,7 @@ describe('user.save', () => {
 describe('user.comparePassword', () => {
   test('should return true for same passwords', () => {
     const password = faker.random.word();
-    return new User()
+    return User
       .forge({
         email: faker.internet.email(),
         password,
@@ -31,7 +31,7 @@ describe('user.comparePassword', () => {
       .then(isSame => expect(isSame).toBe(true));
   });
 
-  test('should return false for different passwords', () => new User()
+  test('should return false for different passwords', () => User
     .forge({
       email: faker.internet.email(),
       password: faker.random.word(),

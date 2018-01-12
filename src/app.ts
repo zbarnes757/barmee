@@ -6,7 +6,6 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import * as logger from 'morgan';
 import * as passport from 'passport';
 import * as bluebird from 'bluebird';
-import * as createError from 'http-errors';
 
 global.Promise = bluebird;
 
@@ -71,7 +70,7 @@ if (process.env.NODE_ENV === 'dev') {
 }
 
 // catch 404 and forward to error handler
-app.use((req, res) => createError(404, 'Page not found.'));
+app.use((req, res) => res.status(404).send('Page not found.'));
 
 // error handler
 app.use((err, req, res, next) => {
