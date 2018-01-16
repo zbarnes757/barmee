@@ -70,6 +70,7 @@
     "eslint-plugin-jest": "^21.5.0",
     "faker": "^4.1.0",
     "jest": "^22.0.3",
+    "knex-cleaner": "^1.1.4",
     "supertest": "^3.0.0",
     "ts-jest": "^22.0.1"
   }

@@ -1,5 +1,5 @@
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const dbconfig = require('./knexfile');
+const dbconfig = require('../knexfile');
 
 import * as Knex from 'knex';
 import * as Bookshelf from 'bookshelf';

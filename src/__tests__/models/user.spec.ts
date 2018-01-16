@@ -40,3 +40,13 @@ describe('user.comparePassword', () => {
     .then(user => user.comparePassword(faker.random.word()))
     .then(isSame => expect(isSame).toBe(false)));
 });
+
+describe('user.toJSON', () => {
+  test('should not render password after being turned to json', () => User
+    .forge({
+      email: faker.internet.email(),
+      password: faker.random.word(),
+    })
+  .save()
+  .then((user) => expect(user.toJSON().password).toBeFalsy()));
+});

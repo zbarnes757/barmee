@@ -6,13 +6,10 @@ const db = Database.getInstance();
 const bookshelf = db.getBookshelf();
 
 export default class User extends bookshelf.Model<User> {
-  get tableName() { return 'users'; } // eslint-disable-line class-methods-use-this
-
-  get hasTimestamps() { return true; } // eslint-disable-line class-methods-use-this
-
-  get hidden() { return ['password']; } // eslint-disable-line class-methods-use-this
-
   initialize() {
+    this.tableName = 'users';
+    this.hidden = [ 'password' ];
+    this.hasTimestamps = true;
     this.on('creating', this.hashPassword, this);
     this.on('creating', this.setId, this);
   }
