@@ -3,13 +3,14 @@
     "module": "commonjs",
     "outDir": "./build",
     "allowJs": true,
-    "target": "es2015",
+    "target": "esnext",
     "removeComments": true,
   },
   "include": [
     "./src/**/*"
   ],
   "exclude": [
-    "./src/__tests__/**/*"
+    "./src/__tests__/**/*",
+    "./src/db_reset.ts"
   ]
 }
