@@ -1,5 +1,6 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
+import { Request, Response, NextFunction } from 'express';
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 import * as helmet from 'helmet';
 import { Strategy, ExtractJwt } from 'passport-jwt';
@@ -12,7 +13,6 @@ global.Promise = bluebird;
 const sessions = require('./routes/sessions');
 const schema = require('./schema');
 import User from './models/user';
-import { NextFunction } from 'express';
 
 const app = express();
 
@@ -24,17 +24,16 @@ const jwtOpts = {
 
 passport.use(new Strategy(
   jwtOpts,
-  async (jwtPayload, done) => {
-    try {
-      const user = await User
-        .forge({ id: jwtPayload.id })
-        .fetch();
-      if (!user) { return done(null, false); }
+  (jwtPayload, done): any => {
+    return User
+      .forge({ id: jwtPayload.id })
+      .fetch()
+      .then((user) => {
+        if (!user) { return done(null, false); }
 
-      return done(null, user);
-    } catch (error) {
-      return done(null, false);
-    }
+        return done(null, user);
+      })
+      .catch(() => done(null, false));
   },
 ));
 
@@ -66,15 +65,11 @@ app.use(
   graphqlExpress(req => ({ schema, context: { user: req.user } })),
 );
 
-if (process.env.NODE_ENV === 'dev') {
-  app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
-}
-
 // catch 404 and forward to error handler
-app.use((req, res) => res.status(404).send('Page not found.'));
+app.use((req: Request, res: Response): Response => res.status(404).send('Page not found.'));
 
 // error handler
-app.use((err, req, res, next) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction): any => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

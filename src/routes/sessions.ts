@@ -1,13 +1,13 @@
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
 import User from '../models/user';
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'kitty-kats';
 
-router.post('/signup', async (req: Request, res: Response) => {
+router.post('/signup', async (req: Request, res: Response): Promise<any> => {
   try {
     const user = await User
       .forge({ email: req.body.email, password: req.body.password })
@@ -21,7 +21,7 @@ router.post('/signup', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', async (req: Request, res: Response): Promise<any> => {
   try {
     const user = await User
       .forge({ email: req.body.email })
