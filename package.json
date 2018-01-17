@@ -6,7 +6,8 @@
     "start": "node ./bin/www",
     "test": "jest --forceExit",
     "lint": "eslint . --fix",
-    "build": "gulp"
+    "build": "gulp",
+    "migrate": "knex migrate:latest"
   },
   "engines": {
     "node": ">= 8.5.0"
