@@ -35,7 +35,9 @@ export class Server {
 
   public app: express.Application;
 
-  private model: IModel;
+  public connection: mongoose.Connection;
+
+  public model: IModel;
 
   /**
    * Constructor.
@@ -72,6 +74,7 @@ export class Server {
     mongoose.Promise = global.Promise;
 
     const connection: mongoose.Connection = mongoose.createConnection(MONGODB_CONNECTION);
+    this.connection = connection;
     this.model.user = connection.model<IUserModel>("User", userSchema);
 
     // Setup passport
