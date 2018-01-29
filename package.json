@@ -7,33 +7,35 @@
     "test": "jest --forceExit",
     "lint": "eslint . --fix",
     "build": "gulp",
-    "migrate": "knex migrate:latest"
+    "migrate": "sequelize db:migrate"
   },
   "engines": {
     "node": ">= 8.5.0"
   },
   "dependencies": {
+    "@turf/helpers": "^6.0.0-beta.3",
     "apollo-server-express": "^1.3.2",
     "bcrypt": "^1.0.3",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
-    "bookshelf": "^0.12.0",
-    "bookshelf-uuid": "^1.0.0",
+    "common-password": "^0.1.2",
     "debug": "^3.1.0",
     "express": "^4.16.2",
     "graphql": "^0.11.0",
+    "graphql-geojson": "^1.0.0",
     "graphql-tools": "^2.17.0",
     "gulp": "^3.9.1",
     "gulp-typescript": "^4.0.0-alpha.1",
     "helmet": "^3.9.0",
     "jsonwebtoken": "^8.1.0",
-    "knex": "^0.13.0",
+    "mongoose": "^5.0.1",
+    "mongoose-hidden": "^1.5.2",
     "morgan": "^1.9.0",
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.1",
-    "pg": "^7.4.0",
     "typescript": "^2.6.2",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "wkx": "^0.4.2"
   },
   "jest": {
     "testEnvironment": "node",
@@ -51,19 +53,25 @@
     ]
   },
   "devDependencies": {
+    "@turf/invariant": "^6.0.0-beta.3",
+    "@turf/random": "^5.1.5",
     "@types/bcrypt": "^1.0.0",
     "@types/bluebird": "^3.5.19",
-    "@types/bookshelf": "^0.9.7",
     "@types/express": "^4.11.0",
     "@types/faker": "^4.1.2",
+    "@types/geojson": "^7946.0.0",
     "@types/helmet": "0.0.37",
     "@types/jest": "^22.0.1",
     "@types/jsonwebtoken": "^7.2.5",
     "@types/knex": "^0.14.0",
+    "@types/knex-postgis": "^0.2.1",
+    "@types/mongodb": "^3.0.5",
+    "@types/mongoose": "^4.7.33",
     "@types/morgan": "^1.7.35",
     "@types/node": "^9.3.0",
     "@types/passport": "^0.4.2",
     "@types/passport-jwt": "^3.0.0",
+    "@types/supertest": "^2.0.4",
     "@types/uuid": "^3.4.3",
     "eslint": "^4.14.0",
     "eslint-config-airbnb-base": "^12.1.0",
@@ -71,8 +79,8 @@
     "eslint-plugin-jest": "^21.5.0",
     "faker": "^4.1.0",
     "jest": "^22.0.3",
-    "knex-cleaner": "^1.1.4",
     "supertest": "^3.0.0",
-    "ts-jest": "^22.0.1"
+    "ts-jest": "^22.0.1",
+    "tslint": "^5.9.1"
   }
 }

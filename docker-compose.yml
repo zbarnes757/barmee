@@ -7,3 +7,10 @@ services:
     environment:
       DB_USER: "postgres"
       DB_PASS: "postgres"
+  mongodb:
+    image: 'bitnami/mongodb'
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGODB_DATABASE=barmee
+

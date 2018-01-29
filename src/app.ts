@@ -1,83 +1,138 @@
-import * as bodyParser from 'body-parser';
-import * as express from 'express';
-import { Request, Response, NextFunction } from 'express';
-const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
-import * as helmet from 'helmet';
-import { Strategy, ExtractJwt } from 'passport-jwt';
-import * as logger from 'morgan';
-import * as passport from 'passport';
-import * as bluebird from 'bluebird';
+import { graphiqlExpress, graphqlExpress } from "apollo-server-express";
+import * as bluebird from "bluebird";
+import * as bodyParser from "body-parser";
+import * as express from "express";
+import { NextFunction, Request, Response } from "express";
+import * as helmet from "helmet";
+import mongoose = require("mongoose");
+import * as logger from "morgan";
+import * as passport from "passport";
+import { ExtractJwt, Strategy } from "passport-jwt";
 
-global.Promise = bluebird;
+import { SessionRoute } from "./routes/sessions";
+import schema = require("./schema");
 
-const sessions = require('./routes/sessions');
-const schema = require('./schema');
-import User from './models/user';
+// interfaces
+import { IUser } from "./interfaces/user"; // import IUser
 
-const app = express();
+// models
+import { IModel } from "./models/model"; // import IModel
+import { IUserModel } from "./models/user"; // import IUserModel
+
+// schemas
+import { userSchema } from "./mongoSchemas/user"; // import userSchema
 
 // Setup passport jwt
 const jwtOpts = {
-  secretOrKey: process.env.JWT_SECRET || 'kitty-kats',
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET || "kitty-kats",
 };
 
-passport.use(new Strategy(
-  jwtOpts,
-  (jwtPayload, done): any => {
-    return User
-      .forge({ id: jwtPayload.id })
-      .fetch()
-      .then((user) => {
-        if (!user) { return done(null, false); }
+export class Server {
+  public static bootstrap(): Server {
+    return new Server();
+  }
 
-        return done(null, user);
-      })
-      .catch(() => done(null, false));
-  },
-));
+  public app: express.Application;
 
-passport.serializeUser((user: User, done) => {
-  done(null, user.get('id'));
-});
+  private model: IModel;
 
-passport.deserializeUser(async (id: String, done) => {
-  const user = await User
-    .forge({ id })
-    .fetch();
-  done(null, user);
-});
+  /**
+   * Constructor.
+   *
+   * @class Server
+   * @constructor
+   */
+  constructor() {
+    this.model = Object();
 
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(helmet());
-app.use(passport.initialize());
-app.use(passport.session());
+    this.app = express();
 
-// Routes
+    this.config();
 
-app.use('/sessions', sessions);
-app.use(
-  '/graphql',
-  bodyParser.json(),
-  passport.authenticate('jwt', { session: false }),
-  graphqlExpress(req => ({ schema, context: { user: req.user } })),
-);
+    this.routes();
+  }
 
-// catch 404 and forward to error handler
-app.use((req: Request, res: Response): Response => res.status(404).send('Page not found.'));
+  /**
+   * config
+   * Configure application
+   *
+   * @class Server
+   * @method config
+   */
+  public config() {
+    const MONGODB_CONNECTION: string = process.env.MONGODB_CONNECTION || "mongodb://localhost:27017/barmee";
 
-// error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction): any => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    this.app.use(logger("dev"));
+    this.app.use(bodyParser.json());
+    this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(helmet());
 
-  // render the error page
-  res.status(err.status || 500);
-  res.json('error');
-  next();
-});
+    global.Promise = bluebird;
+    mongoose.Promise = global.Promise;
 
-module.exports = app;
+    const connection: mongoose.Connection = mongoose.createConnection(MONGODB_CONNECTION);
+    this.model.user = connection.model<IUserModel>("User", userSchema);
+
+    // Setup passport
+    passport.use(new Strategy(
+      jwtOpts,
+      (jwtPayload, done): any => {
+        return this.model.user
+          .findById(jwtPayload.id)
+          .then((user) => {
+            if (!user) { return done(null, false); }
+
+            return done(null, user);
+          })
+          .catch(() => done(null, false));
+      },
+    ));
+
+    passport.serializeUser((user: IUserModel, done) => {
+      done(null, user.id);
+    });
+
+    passport.deserializeUser(async (id: string, done) => {
+      const user = await this.model.user
+        .findById(id);
+
+      done(null, user);
+    });
+
+    this.app.use(passport.initialize());
+    this.app.use(passport.session());
+  }
+
+  private routes() {
+    let router: express.Router;
+    router = express.Router();
+
+    // Sessions Routes
+    SessionRoute.create(router, this.model);
+
+    this.app.use(router);
+
+    // Setup graphql
+    this.app.use(
+      "/graphql",
+      bodyParser.json(),
+      passport.authenticate("jwt", { session: false }),
+      graphqlExpress((req) => ({ schema, context: { user: req.user } })),
+    );
+    // catch 404 and forward to error handler
+    this.app.use((req: Request, res: Response): Response => res.status(404).send("Page not found."));
+
+    // error handler
+    this.app.use((err: any, req: Request, res: Response, next: NextFunction): any => {
+      // set locals, only providing error in development
+      res.locals.message = err.message;
+      res.locals.error = req.app.get("env") === "development" ? err : {};
+
+      // render the error page
+      res.status(err.status || 500);
+      res.json("error");
+      next();
+    });
+  }
+}

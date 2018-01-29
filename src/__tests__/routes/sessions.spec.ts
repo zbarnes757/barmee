@@ -1,9 +1,9 @@
 import * as faker from 'faker';
-const request = require('supertest');
+import * as request from 'supertest';
+import User from '../../models/user';
 
 const app = require('../../app');
 const dbReset = require('../../db_reset');
-import User from '../../models/user';
 
 beforeEach(() => dbReset());
 

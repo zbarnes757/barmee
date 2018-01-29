@@ -1,5 +1,5 @@
-import User from "../models/user";
+import { IUserModel } from "../models/user";
 
-export default interface Context {
-  user: User
+export interface IContext {
+  user: IUserModel;
 }

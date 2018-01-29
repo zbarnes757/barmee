@@ -5,9 +5,11 @@
 /**
  * Module dependencies.
  */
-const app = require('../build/app');
+const server = require('../build/app');
 const debug = require('debug')('barmee:server');
 const http = require('http');
+
+const { app } = server.Server.bootstrap();
 
 /**
  * Normalize a port into a number, string, or false.
@@ -69,14 +71,14 @@ function onError(error) {
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+const httpServer = http.createServer(app);
 
 /**
  * Event listener for HTTP server "listening" event.
  */
 
 function onListening() {
-  const addr = server.address();
+  const addr = httpServer.address();
   const bind = typeof addr === 'string'
     ? `pipe ${addr}`
     : `port ${addr.port}`;
@@ -87,7 +89,7 @@ function onListening() {
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+httpServer.listen(port);
+httpServer.on('error', onError);
+httpServer.on('listening', onListening);
 
